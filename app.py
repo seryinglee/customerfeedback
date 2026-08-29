@@ -71,7 +71,7 @@ st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
 
 with st.sidebar:
     st.markdown('<div class="sidebar-title">⚙️ Settings</div>', unsafe_allow_html=True)
-    model_choice = st.radio("Select Model", ["Logistic Regression", "SVM", "BERT"])
+model_choice = st.radio("Select Model", ["SVM", "Logistic Regression", "BERT"])
 
 @st.cache_resource
 def _load_simple_model(choice):
