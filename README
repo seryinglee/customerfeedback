@@ -1,0 +1,30 @@
+--Install dependencies--
+Type in terminal:
+pip install --upgrade pip
+pip install -r requirements.txt
+
+2. Download NLTK resources
+Type in Command Prompt:
+python
+import nltk
+nltk.download('punkt')
+nltk.download('wordnet')
+nltk.download('omw-1.4')
+
+--Run Streamlit Web App--
+Type in terminal:
+streamlit run app.py
+1. Choose a model (Logistic Regression, SVM, BERT) from the sidebar
+2. Use the tabs to:
+   Single Review: Input or select a review and generate a prediction + reply
+   Batch Prediction: Upload a CSV with a text column and download results
+3. Compare Model Performance:
+   Open the "Model Comparison" page in Streamlit from the sidebar
+   Click "Run Model Evaluation" to compare Accuracy, Precision, Recall, and F1 Score
+
+--Run via Console--
+Type in terminal:
+python main.py
+1. Choose a model (1=Logistic Regression, 2=SVM, 3=BERT)
+2. Enter reviews manually and receive predictions
+3. Type exit to quit
