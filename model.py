@@ -164,8 +164,14 @@ def load_dataset(for_bert=False):
         return None, None
     
     samples_per_class = 500
-    balanced_df = df.groupby('review_type').apply(
-        lambda x: x.sample(n=min(len(x), samples_per_class), random_state=42)
+    balanced_df = df.groupby(
+        "review_type",
+        group_keys=False
+    ).apply(
+        lambda x: x.sample(
+            n=min(len(x), samples_per_class),
+            random_state=42
+        )
     ).reset_index(drop=True)
     
     return balanced_df["description"], balanced_df["review_type"]
