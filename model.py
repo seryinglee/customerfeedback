@@ -254,7 +254,7 @@ def train_svm_model():
 
 @st.cache_resource
 def train_bert_model(for_bert=True):
-    X, y = load_dataset()
+    X, y = load_dataset(for_bert=True)
     if X is None: return None, None
     
     X_train, X_test, y_train, y_test = train_test_split(
