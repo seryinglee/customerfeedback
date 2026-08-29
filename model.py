@@ -1,4 +1,3 @@
-from pathlib import Path
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
@@ -8,7 +7,6 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 import pandas as pd
 import preprocess
 import re
-import joblib
 
 import torch
 import torch.nn as nn
@@ -190,25 +188,17 @@ def train_logreg_model():
 
 @st.cache_resource
 def train_svm_model():
-    model_path = Path("models/svm_model.joblib")
-    model_path.parent.mkdir(exist_ok=True)
-   
-    if model_path.exists():
-        print("Loading cached SVM model...")
-        try:
-            model = joblib.load(model_path)
-            print("✅ SVM model loaded from cache")
-            return model, (pd.Series([]), pd.Series([]))
-        except Exception as e:
-            print(f"Failed to load cached model: {e}")
-   
-    print("Training improved SVM model...")
+    print("Training SVM model...")
+
     X, y = load_dataset(for_bert=False)
     if X is None:
         return None, None
 
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42, stratify=y
+        X, y,
+        test_size=0.2,
+        random_state=42,
+        stratify=y
     )
 
     tfidf = TfidfVectorizer(
@@ -219,54 +209,59 @@ def train_svm_model():
         max_df=0.95,
         sublinear_tf=True,
         use_idf=True,
-        norm='l2',
+        norm="l2",
         lowercase=True,
-        token_pattern=r'\b[a-zA-Z]{2,}\b'
+        token_pattern=r"\b[a-zA-Z]{2,}\b"
     )
-   
+
     svm_clf = SVC(
         kernel="linear",
         C=0.8,
-        probability=True,
+        probability=False,
         class_weight="balanced",
         cache_size=1000,
         max_iter=1500,
         random_state=42,
         tol=1e-4
     )
-   
+
     model = Pipeline([
         ("tfidf", tfidf),
         ("clf", svm_clf)
     ])
-   
-    print("Fitting improved SVM model...")
+
+    print("Fitting SVM model...")
     model.fit(X_train, y_train)
-   
-    try:
-        joblib.dump(model, model_path)
-        print(f"✅ Improved SVM model saved to {model_path}")
-    except Exception as e:
-        print(f"Failed to save model: {e}")
-   
-    print("Improved SVM training completed!")
+
+    print("SVM training completed!")
+
     return model, (X_test, y_test)
 
 @st.cache_resource
 def train_bert_model(for_bert=True):
     X, y = load_dataset(for_bert=True)
-    if X is None: return None, None
-    
+
+    if X is None:
+        return None, None
+
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42, stratify=y
+        X, y,
+        test_size=0.2,
+        random_state=42,
+        stratify=y
     )
 
     num_classes = y.nunique()
-    model = BERTClassifier(epochs=3, num_labels=num_classes)
-    model.fit(X_train, y_train)
-    
-    return model, (X_test, y_test)
 
+    model = BERTClassifier(
+        epochs=3,
+        num_labels=num_classes
+    )
+
+    model.fit(X_train, y_train)
+
+    return model, (X_test, y_test)
+    
 def evaluate_models():
     X_raw, y_raw = load_dataset(for_bert=True)
     if X_raw is None:
